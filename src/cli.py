@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
 import pandas as pd
 
@@ -30,6 +31,7 @@ def main() -> None:
         return
 
     predictions = predict_sales(pd.read_csv(arguments.data_path), arguments.model_path)
+    Path(arguments.output_path).parent.mkdir(parents=True, exist_ok=True)
     predictions.to_csv(arguments.output_path, index=False)
     print(f"Saved predictions to {arguments.output_path}")
 
