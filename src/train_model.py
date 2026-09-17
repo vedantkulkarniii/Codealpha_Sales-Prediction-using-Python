@@ -2,7 +2,56 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 
-def train_model() -> None:
-    """Placeholder training entry point."""
-    return None
+import joblib
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, r2_score
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+
+from .data_cleaning import clean_dataset, load_data
+from .feature_engineering import build_features
+from .preprocessing import build_preprocessor
+
+
+def train_model(
+    data_path: str,
+    target_column: str,
+    model_path: str = "models/sales_model.joblib",
+    test_size: float = 0.2,
+    random_state: int = 42,
+) -> dict[str, float]:
+    """Train, evaluate, and persist a sales regression pipeline."""
+    dataset = build_features(clean_dataset(load_data(data_path)))
+    if target_column not in dataset.columns:
+        raise ValueError(f"Target column not found: {target_column}")
+    if len(dataset) < 5:
+        raise ValueError("At least five rows are required for training")
+
+    features = dataset.drop(columns=[target_column])
+    target = dataset[target_column]
+    x_train, x_test, y_train, y_test = train_test_split(
+        features, target, test_size=test_size, random_state=random_state
+    )
+    pipeline = Pipeline(
+        steps=[
+            ("preprocessor", build_preprocessor(x_train)),
+            ("model", RandomForestRegressor(n_estimators=200, random_state=random_state)),
+        ]
+    )
+    pipeline.fit(x_train, y_train)
+    predictions = pipeline.predict(x_test)
+
+    artifact = {
+        "pipeline": pipeline,
+        "target_column": target_column,
+        "feature_columns": features.columns.tolist(),
+    }
+    output_path = Path(model_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(artifact, output_path)
+    return {
+        "mae": float(mean_absolute_error(y_test, predictions)),
+        "r2": float(r2_score(y_test, predictions)),
+    }
