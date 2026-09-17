@@ -6,11 +6,11 @@ from pathlib import Path
 
 import joblib
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
 from .data_cleaning import clean_dataset, load_data
+from .evaluation import evaluate_regression
 from .feature_engineering import build_features
 from .preprocessing import build_preprocessor
 
@@ -51,7 +51,4 @@ def train_model(
     output_path = Path(model_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(artifact, output_path)
-    return {
-        "mae": float(mean_absolute_error(y_test, predictions)),
-        "r2": float(r2_score(y_test, predictions)),
-    }
+    return evaluate_regression(y_test, predictions)

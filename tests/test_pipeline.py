@@ -4,11 +4,18 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.evaluation import evaluate_regression
 from src.predict import predict_sales
 from src.train_model import train_model
 
 
 class PipelineTests(unittest.TestCase):
+    def test_evaluation_returns_named_regression_metrics(self):
+        metrics = evaluate_regression(pd.Series([10, 20]), pd.Series([12, 18]))
+
+        self.assertAlmostEqual(metrics["mae"], 2.0)
+        self.assertAlmostEqual(metrics["r2"], 0.84)
+
     def test_training_and_prediction_share_the_same_artifact(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             model_path = Path(temporary_directory) / "sales_model.joblib"
