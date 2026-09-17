@@ -16,16 +16,15 @@ Build a professional sales forecasting pipeline that predicts future sales from 
 - `outputs/figures/` - generated charts and visualizations
 - `outputs/predictions/` - prediction outputs
 
-## Day 1 foundation
+## Current pipeline
 
-The repository has been initialized with the expected project layout and utility modules to support the next steps:
+The reusable pipeline now supports:
 
-- data organization
-- dataset loading and inspection
-- data cleaning utilities
-- preprocessing helpers
-- feature engineering placeholders
-- model training and prediction placeholders
+- duplicate removal and missing-value handling
+- campaign duration and advertising-spend features
+- numeric scaling and categorical one-hot encoding
+- random-forest training with MAE and R2 evaluation
+- persisted model loading for repeatable predictions
 
 ## Setup
 
@@ -37,4 +36,12 @@ pip install -r requirements.txt
 
 ## Notes
 
-This is the initial project scaffold for the four-day milestone workflow. The next step is to add the real dataset and begin investigation and cleaning work.
+The repository includes a small sample dataset for local verification. Replace it with the project dataset before interpreting model quality.
+
+## Run the pipeline
+
+```bash
+python -m src.cli train data/raw/sample_sales.csv sales --model-path models/sales_model.joblib
+python -m src.cli predict data/raw/sample_sales.csv --model-path models/sales_model.joblib --output-path outputs/predictions/predictions.csv
+python -m unittest discover -s tests -v
+```
