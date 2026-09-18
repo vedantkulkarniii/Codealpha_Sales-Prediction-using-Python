@@ -6,7 +6,7 @@ from pathlib import Path
 
 import joblib
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_validate, train_test_split
 from sklearn.pipeline import Pipeline
 
 from .config import TrainingConfig
@@ -55,6 +55,14 @@ def train_model(
     )
     pipeline.fit(x_train, y_train)
     predictions = pipeline.predict(x_test)
+    folds = min(training_config.cv_folds, len(features))
+    cross_validation = cross_validate(
+        pipeline,
+        features,
+        target,
+        cv=folds,
+        scoring={"mae": "neg_mean_absolute_error", "r2": "r2"},
+    )
 
     artifact = {
         "pipeline": pipeline,
@@ -64,4 +72,7 @@ def train_model(
     output_path = Path(model_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(artifact, output_path)
-    return evaluate_regression(y_test, predictions)
+    metrics = evaluate_regression(y_test, predictions)
+    metrics["cv_mae"] = float(-cross_validation["test_mae"].mean())
+    metrics["cv_r2"] = float(cross_validation["test_r2"].mean())
+    return metrics

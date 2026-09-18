@@ -13,6 +13,7 @@ class TrainingConfig:
     random_state: int = 42
     n_estimators: int = 300
     min_samples_leaf: int = 1
+    cv_folds: int = 5
 
     def __post_init__(self) -> None:
         if not 0 < self.test_size < 1:
@@ -21,3 +22,5 @@ class TrainingConfig:
             raise ValueError("n_estimators must be positive")
         if self.min_samples_leaf < 1:
             raise ValueError("min_samples_leaf must be positive")
+        if self.cv_folds < 2:
+            raise ValueError("cv_folds must be at least 2")
