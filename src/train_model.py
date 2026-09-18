@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from datetime import datetime, timezone
 
 import joblib
 from sklearn.ensemble import RandomForestRegressor
@@ -64,15 +65,25 @@ def train_model(
         scoring={"mae": "neg_mean_absolute_error", "r2": "r2"},
     )
 
+    metrics = evaluate_regression(y_test, predictions)
+    metrics["cv_mae"] = float(-cross_validation["test_mae"].mean())
+    metrics["cv_r2"] = float(cross_validation["test_r2"].mean())
     artifact = {
+        "schema_version": 2,
         "pipeline": pipeline,
         "target_column": target_column,
         "feature_columns": features.columns.tolist(),
+        "metrics": metrics,
+        "trained_at": datetime.now(timezone.utc).isoformat(),
+        "training_config": {
+            "test_size": training_config.test_size,
+            "random_state": training_config.random_state,
+            "n_estimators": training_config.n_estimators,
+            "min_samples_leaf": training_config.min_samples_leaf,
+            "cv_folds": training_config.cv_folds,
+        },
     }
     output_path = Path(model_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(artifact, output_path)
-    metrics = evaluate_regression(y_test, predictions)
-    metrics["cv_mae"] = float(-cross_validation["test_mae"].mean())
-    metrics["cv_r2"] = float(cross_validation["test_r2"].mean())
     return metrics
