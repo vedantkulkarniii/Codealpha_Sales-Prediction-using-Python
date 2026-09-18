@@ -6,6 +6,7 @@ import pandas as pd
 
 from src.evaluation import evaluate_regression
 from src.predict import predict_sales
+from src.predict import load_model_artifact
 from src.train_model import train_model
 
 
@@ -33,8 +34,13 @@ class PipelineTests(unittest.TestCase):
             self.assertTrue(model_path.exists())
             self.assertIn("mae", metrics)
             self.assertIn("r2", metrics)
+            self.assertIn("cv_mae", metrics)
             self.assertEqual(len(predictions), 2)
             self.assertEqual(list(predictions.columns), ["predicted_sales"])
+
+            artifact = load_model_artifact(str(model_path))
+            self.assertEqual(artifact["schema_version"], 2)
+            self.assertIn("trained_at", artifact)
 
 
 if __name__ == "__main__":
