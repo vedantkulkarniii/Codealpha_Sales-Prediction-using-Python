@@ -63,8 +63,8 @@ The project has been validated locally with real execution.
 ```
 
 Result:
-- 7 tests executed
-- 7 tests passed
+- 6 tests executed
+- 6 tests passed
 - exit code 0
 
 Real model execution also succeeded:

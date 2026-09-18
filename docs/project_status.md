@@ -11,8 +11,12 @@ The sales prediction project is now validated in the local environment.
 - preprocessing with scaling and one-hot encoding
 - Random Forest regression training
 - evaluation metrics for MAE and R2
+- additional RMSE, MAPE, and cross-validation metrics
 - saved model artifact loading for repeat predictions
+- versioned artifact provenance and training configuration
 - CLI-based training and prediction flow
+- input schema validation and normalized headers
+- GitHub Actions test automation
 
 ### Validation status
 
@@ -22,7 +26,7 @@ The repository passes its unit tests with the project virtual environment:
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-This produced 4 passing tests.
+This produced 6 passing tests locally. The same command is also configured in `.github/workflows/ci.yml` for pushes and pull requests.
 
 ### End-to-end run
 
