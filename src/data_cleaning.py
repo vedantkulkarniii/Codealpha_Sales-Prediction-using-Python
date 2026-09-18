@@ -7,7 +7,16 @@ import pandas as pd
 
 def load_data(file_path: str) -> pd.DataFrame:
     """Load a CSV dataset into a Pandas DataFrame."""
-    return pd.read_csv(file_path)
+    return normalize_column_names(pd.read_csv(file_path))
+
+
+def normalize_column_names(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalize headers so files from spreadsheets behave consistently."""
+    normalized = df.copy()
+    normalized.columns = (
+        normalized.columns.astype(str).str.strip().str.lower().str.replace(" ", "_", regex=False)
+    )
+    return normalized
 
 
 def drop_duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
@@ -30,7 +39,7 @@ def fill_missing_values(df: pd.DataFrame) -> pd.DataFrame:
 
 def clean_dataset(df: pd.DataFrame) -> pd.DataFrame:
     """Apply the standard cleaning steps used before feature engineering."""
-    return fill_missing_values(drop_duplicate_rows(df))
+    return fill_missing_values(drop_duplicate_rows(normalize_column_names(df)))
 
 
 def summarize_dataframe(df: pd.DataFrame) -> dict:
