@@ -30,6 +30,12 @@ class DataCleaningTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_dataset(data, required_columns=["missing"])
 
+    def test_validation_rejects_empty_and_non_numeric_targets(self):
+        with self.assertRaises(ValueError):
+            validate_dataset(pd.DataFrame(), target_column="sales")
+        with self.assertRaises(TypeError):
+            validate_dataset(pd.DataFrame({"sales": ["unknown"]}), target_column="sales")
+
 
 if __name__ == "__main__":
     unittest.main()
