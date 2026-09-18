@@ -8,6 +8,8 @@ from pathlib import Path
 import pandas as pd
 
 from .predict import predict_sales
+from .config import TrainingConfig
+from .logging_utils import configure_logging
 from .train_model import train_model
 
 
@@ -19,15 +21,20 @@ def main() -> None:
     train_parser.add_argument("data_path")
     train_parser.add_argument("target_column")
     train_parser.add_argument("--model-path", default="models/sales_model.joblib")
+    train_parser.add_argument("--n-estimators", type=int, default=300)
+    train_parser.add_argument("--cv-folds", type=int, default=5)
 
     predict_parser = subparsers.add_parser("predict", help="Predict sales from a CSV")
     predict_parser.add_argument("data_path")
     predict_parser.add_argument("--model-path", default="models/sales_model.joblib")
     predict_parser.add_argument("--output-path", default="outputs/predictions/predictions.csv")
+    parser.add_argument("--verbose", action="store_true", help="Enable detailed logs")
 
     arguments = parser.parse_args()
+    configure_logging(arguments.verbose)
     if arguments.command == "train":
-        print(train_model(arguments.data_path, arguments.target_column, arguments.model_path))
+        config = TrainingConfig(n_estimators=arguments.n_estimators, cv_folds=arguments.cv_folds)
+        print(train_model(arguments.data_path, arguments.target_column, arguments.model_path, config=config))
         return
 
     predictions = predict_sales(pd.read_csv(arguments.data_path), arguments.model_path)
