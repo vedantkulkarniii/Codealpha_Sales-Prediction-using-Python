@@ -14,6 +14,8 @@ class PipelineTests(unittest.TestCase):
         metrics = evaluate_regression(pd.Series([10, 20]), pd.Series([12, 18]))
 
         self.assertAlmostEqual(metrics["mae"], 2.0)
+        self.assertAlmostEqual(metrics["rmse"], 2.0)
+        self.assertAlmostEqual(metrics["mape"], 0.15)
         self.assertAlmostEqual(metrics["r2"], 0.84)
 
     def test_training_and_prediction_share_the_same_artifact(self):
