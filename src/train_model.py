@@ -6,6 +6,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 import joblib
+import logging
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_validate, train_test_split
 from sklearn.pipeline import Pipeline
@@ -16,6 +17,8 @@ from .evaluation import evaluate_regression
 from .feature_engineering import build_features
 from .preprocessing import build_preprocessor
 from .validation import validate_dataset
+
+LOGGER = logging.getLogger(__name__)
 
 
 def train_model(
@@ -29,6 +32,7 @@ def train_model(
     """Train, evaluate, and persist a sales regression pipeline."""
     training_config = config or TrainingConfig(test_size=test_size, random_state=random_state)
     dataset = build_features(clean_dataset(load_data(data_path)))
+    LOGGER.info("Training on %d rows and %d columns", len(dataset), len(dataset.columns))
     validate_dataset(dataset, target_column=target_column)
     if len(dataset) < 5:
         raise ValueError("At least five rows are required for training")
@@ -86,4 +90,5 @@ def train_model(
     output_path = Path(model_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(artifact, output_path)
+    LOGGER.info("Saved model artifact to %s", output_path)
     return metrics
