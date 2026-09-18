@@ -3,6 +3,7 @@ import unittest
 import pandas as pd
 
 from src.data_cleaning import clean_dataset, summarize_dataframe
+from src.validation import validate_dataset
 
 
 class DataCleaningTests(unittest.TestCase):
@@ -21,6 +22,13 @@ class DataCleaningTests(unittest.TestCase):
 
         self.assertEqual(summary["shape"], (2, 1))
         self.assertEqual(summary["duplicate_rows"], 1)
+
+    def test_validation_checks_target_and_required_columns(self):
+        data = pd.DataFrame({"sales": [10], "channel": ["TV"]})
+
+        validate_dataset(data, target_column="sales", required_columns=["channel"])
+        with self.assertRaises(ValueError):
+            validate_dataset(data, required_columns=["missing"])
 
 
 if __name__ == "__main__":
