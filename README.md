@@ -1,6 +1,6 @@
 # Sales Prediction using Python
 
-A complete end-to-end sales forecasting project built with Python, Pandas, NumPy, Scikit-learn, and Matplotlib. The project trains a regression model to predict sales based on campaign and marketing features and exposes a reusable CLI for training and inference.
+A production-minded end-to-end sales forecasting project built with Python, Pandas, NumPy, Scikit-learn, and Matplotlib. It trains a reproducible regression pipeline, persists provenance metadata, reports holdout and cross-validation metrics, and exposes a reusable CLI for training and inference.
 
 ## Project objective
 
@@ -10,7 +10,8 @@ Develop a clean machine learning pipeline that can:
 - preprocess numeric and categorical inputs,
 - train a prediction model,
 - evaluate model quality,
-- save and reuse the trained artifact for future predictions.
+- save and reuse a versioned trained artifact for future predictions,
+- validate incoming schemas and reject unsafe inputs early.
 
 ## Repository structure
 
@@ -30,8 +31,10 @@ The project currently supports:
 - numeric scaling and categorical one-hot encoding,
 - Random Forest regression training,
 - MAE and R2 evaluation,
+- RMSE, MAPE, and cross-validation diagnostics,
 - model artifact persistence for repeated prediction,
-- CLI-based training and prediction workflow.
+- model provenance metadata including configuration and training timestamp,
+- CLI-based training and prediction workflow with configurable estimators and folds.
 
 ## Setup
 
@@ -47,6 +50,7 @@ python -m pip install -r requirements.txt
 ```powershell
 .\.venv\Scripts\python.exe -m src.cli train data/raw/sample_sales.csv sales --model-path models/sales_model.joblib
 .\.venv\Scripts\python.exe -m src.cli predict data/raw/sample_sales.csv --model-path models/sales_model.joblib --output-path outputs/predictions/cli_predictions.csv
+.\.venv\Scripts\python.exe -m src.cli --verbose train data/raw/sample_sales.csv sales --n-estimators 300 --cv-folds 5
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
@@ -59,8 +63,8 @@ The project has been validated locally with real execution.
 ```
 
 Result:
-- 4 tests executed
-- 4 tests passed
+- 7 tests executed
+- 7 tests passed
 - exit code 0
 
 Real model execution also succeeded:
